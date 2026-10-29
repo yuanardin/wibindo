@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/legacy-nextjs/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -13,12 +14,13 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# next.js (legacy)
+/legacy-nextjs/.next/
+/legacy-nextjs/out/
 
 # production
 /build
+/legacy-nextjs/build/
 
 # misc
 .DS_Store
