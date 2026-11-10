@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-final class App
+final readonly class App
 {
     public string $slug;
     public string $name;

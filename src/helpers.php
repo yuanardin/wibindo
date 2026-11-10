@@ -17,12 +17,68 @@ function asset(string $path): string
 
 function screenshot(string $file): string
 {
-    $relative = 'img/screenshots/' . ltrim($file, '/');
-    $fullPath = __DIR__ . '/../public/assets/' . $relative;
+    return screenshotMeta($file)['url'] ?? '';
+}
 
-    if (!is_file($fullPath)) {
-        $relative = 'img/screenshots/placeholder.webp';
+/**
+ * Resolve a screenshot and its intrinsic dimensions.
+ *
+ * @return array{url: string, width: int, height: int}|null
+ */
+function screenshotMeta(string $file): ?array
+{
+    $resolved = resolveScreenshotPath($file);
+    $size = $resolved === null ? false : @getimagesize($resolved);
+
+    if (
+        $size === false
+        || ($size['mime'] ?? '') !== 'image/webp'
+        || $size[0] < 1
+        || $size[1] < 1
+    ) {
+        $resolved = resolveScreenshotPath('placeholder.webp');
+        $size = $resolved === null ? false : @getimagesize($resolved);
     }
 
-    return asset($relative);
+    if (
+        $resolved === null
+        || $size === false
+        || ($size['mime'] ?? '') !== 'image/webp'
+        || $size[0] < 1
+        || $size[1] < 1
+    ) {
+        return null;
+    }
+
+    return [
+        'url' => asset('img/screenshots/' . basename($resolved)),
+        'width' => $size[0],
+        'height' => $size[1],
+    ];
+}
+
+function resolveScreenshotPath(string $file): ?string
+{
+    $screenshotsDir = realpath(__DIR__ . '/../public/assets/img/screenshots');
+
+    if (
+        $screenshotsDir === false
+        || $file === ''
+        || basename($file) !== $file
+        || preg_match('/\A[a-z0-9][a-z0-9-]*\.webp\z/', $file) !== 1
+    ) {
+        return null;
+    }
+
+    $fullPath = realpath($screenshotsDir . DIRECTORY_SEPARATOR . $file);
+
+    if (
+        $fullPath === false
+        || !is_file($fullPath)
+        || !str_starts_with($fullPath, $screenshotsDir . DIRECTORY_SEPARATOR)
+    ) {
+        return null;
+    }
+
+    return $fullPath;
 }
