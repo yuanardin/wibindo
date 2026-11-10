@@ -134,6 +134,21 @@ input {
     text-transform: uppercase;
 }
 
+.eyebrow__line {
+    display: inline-block;
+    width: 1.75rem;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+.hero__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+}
+
 .site-header {
     position: sticky;
     top: 0;
@@ -215,6 +230,14 @@ input {
     font-size: clamp(2.15rem, 5.2vw, 3.9rem);
     line-height: 1.06;
     letter-spacing: -0.035em;
+}
+
+.hero__title-line {
+    display: block;
+}
+
+.hero__accent {
+    color: var(--accent);
 }
 
 .hero__subtitle {
@@ -308,6 +331,9 @@ input {
 }
 
 .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
     padding: 0.55rem 0.95rem;
     border: 1px solid var(--border);
     border-radius: 999px;
@@ -317,6 +343,12 @@ input {
     font-weight: 650;
     cursor: pointer;
     transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.chip svg {
+    width: 1.1em;
+    height: 1.1em;
+    flex: 0 0 auto;
 }
 
 .chip:hover {
@@ -374,15 +406,18 @@ input {
 
 .app-card__media {
     position: relative;
-    aspect-ratio: 16 / 10;
     overflow: hidden;
     background: var(--surface-muted);
 }
 
+.app-card__media:not(:has(img)) {
+    aspect-ratio: 16 / 10;
+}
+
 .app-card__media img {
+    display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
 }
 
 .badge {
