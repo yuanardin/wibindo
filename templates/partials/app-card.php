@@ -1,5 +1,8 @@
 <?php
 declare(strict_types=1);
+
+$isPriorityImage = $isFirstCard ?? false;
+$screenshotMeta = screenshotMeta($app->screenshot);
 ?>
 <article
     class="app-card"
@@ -8,14 +11,17 @@ declare(strict_types=1);
     data-search="<?= e(mb_strtolower($app->name . ' ' . $app->tagline . ' ' . $app->description, 'UTF-8')) ?>"
 >
     <div class="app-card__media">
-        <img
-            src="<?= screenshot($app->screenshot) ?>"
-            alt="Tampilan aplikasi <?= e($app->name) ?>"
-            width="1280"
-            height="800"
-            loading="lazy"
-            decoding="async"
-        >
+        <?php if ($screenshotMeta !== null): ?>
+            <img
+                src="<?= e($screenshotMeta['url']) ?>"
+                alt="Tampilan aplikasi <?= e($app->name) ?>"
+                width="<?= e((string) $screenshotMeta['width']) ?>"
+                height="<?= e((string) $screenshotMeta['height']) ?>"
+                loading="<?= $isPriorityImage ? 'eager' : 'lazy' ?>"
+                <?php if ($isPriorityImage): ?>fetchpriority="high"<?php endif; ?>
+                decoding="async"
+            >
+        <?php endif; ?>
         <?php if ($app->badge !== null && $app->badge !== ''): ?>
             <span class="badge"><?= e($app->badge) ?></span>
         <?php endif; ?>

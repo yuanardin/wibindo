@@ -10,9 +10,9 @@ declare(strict_types=1);
     <meta name="description" content="<?= e($pageDescription) ?>">
     <meta name="robots" content="noindex, nofollow">
     <meta name="color-scheme" content="light dark">
-    <link rel="icon" href="<?= asset('img/favicon.svg') ?>" type="image/svg+xml">
-    <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
-    <script src="<?= asset('js/app.js') ?>" defer></script>
+    <link rel="icon" href="<?= e(asset('img/favicon.svg')) ?>" type="image/svg+xml">
+    <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
+    <script src="<?= e(asset('js/app.js')) ?>" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Lewati ke konten utama</a>
@@ -30,7 +30,8 @@ declare(strict_types=1);
             </div>
 
             <div class="app-grid" id="app-grid">
-                <?php foreach ($apps as $app): ?>
+                <?php foreach ($apps as $index => $app): ?>
+                    <?php $isFirstCard = $index === 0; ?>
                     <?php require __DIR__ . '/partials/app-card.php'; ?>
                 <?php endforeach; ?>
             </div>
