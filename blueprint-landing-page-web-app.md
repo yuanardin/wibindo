@@ -268,7 +268,7 @@ require __DIR__ . '/../templates/layout.php';
 
 ```
 ┌──────────────────────────────┐
-│  [ screenshot 16:10 ]        │  <- lazy loading, rasio tetap
+│  [ screenshot, ideal 16:10 ]  │  <- lazy loading, rasio asli file
 │  ┌──────┐                    │
 │  │badge │ (opsional, pojok)  │
 ├──────────────────────────────┤
@@ -481,13 +481,14 @@ Catatan:
 Cara paling sederhana (tanpa CI):
 
 ```bash
-# di container, sebagai user deploy
-cd /var/www/portal
-git pull origin main          # atau rsync dari mesin developer
-chown -R www-data:www-data .
+# Kondisi repository saat ini: branch master, tanpa remote Git.
+# git pull belum dapat digunakan sebelum remote dan branch deployment resmi dikonfigurasi.
+# Ikuti prosedur penyalinan aman di DEPLOYMENT.md.
+# Hanya salin public/, config/, src/, dan templates/.
+# Jangan salin legacy-nextjs/node_modules atau legacy-nextjs/.next.
 ```
 
-Tidak ada langkah build di server jika `app.css` hasil build sudah di-commit. Disarankan membuat **snapshot/backup LXC** di Proxmox sebelum perubahan besar.
+Tidak ada langkah build di server jika `app.css` hasil build sudah di-commit. Disarankan membuat **snapshot/backup LXC** di Proxmox sebelum perubahan besar. Jangan gunakan PHP built-in server (`php -S`) sebagai server produksi; produksi memakai Nginx + PHP-FPM dengan document root `public/`.
 
 ### 7.7 Verifikasi
 

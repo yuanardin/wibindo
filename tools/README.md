@@ -26,4 +26,4 @@ cwebp -q 80 screenshot.png -o public/assets/img/screenshots/<slug>.webp
 
 Script Playwright tidak disertakan sebagai dependency runtime. Jika ingin otomasi, pasang Playwright di mesin developer, siapkan sesi login akun demo, lalu ambil screenshot untuk setiap URL di `config/apps.php`. Jalankan hanya di mesin developer, bukan di server produksi.
 
-Selama screenshot belum tersedia, helper `screenshot()` otomatis memakai `placeholder.webp`.
+Jika file screenshot belum tersedia atau tidak valid, helper `screenshot()` otomatis memakai `placeholder.webp`.

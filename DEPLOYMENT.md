@@ -187,10 +187,75 @@ systemctl reload caddy
 
 `tls internal` memakai CA internal Caddy. Root CA tersebut harus terpasang dan dipercaya di perangkat karyawan; jika organisasi memakai CA internal lain, partner mengganti konfigurasi TLS sesuai sertifikat resmi. HSTS hanya diaktifkan setelah HTTPS internal sudah tervalidasi.
 
+## Kondisi repository dan metode deploy
+
+Pemeriksaan repository saat dokumen ini disesuaikan (2 November 2026):
+
+- Branch aktif: `master`.
+- Remote Git: belum ada; `git remote -v` tidak menghasilkan output.
+- Dengan kondisi tersebut, `git pull origin main` tidak dapat digunakan. Jangan mengasumsikan remote `origin` atau branch `main` sebelum keduanya dikonfigurasi resmi.
+
+Deployment saat ini harus dilakukan dengan menyalin artefak dari mesin sumber ke server, bukan dengan `git pull`. Metode resmi (arsip, `rsync`, atau mekanisme lain dari partner DevOps) dan lokasi checkout sumber masih perlu dikonfirmasi.
+
+### Penyalinan artefak yang aman
+
+Yang disalin hanya file runtime:
+
+- `public/`
+- `config/`
+- `src/`
+- `templates/`
+
+`public/` tetap menjadi document root. `config/`, `src/`, dan `templates/` harus berada di luar `public/` sebagai sibling.
+
+Jangan menyalin:
+
+- `legacy-nextjs/`, termasuk `legacy-nextjs/node_modules/` dan `legacy-nextjs/.next/`
+- `.git/`
+- file konfigurasi rahasia, kredensial, atau `.env` bila ada
+- cache dan artefak build lokal
+
+Contoh membuat arsip dari mesin sumber (hanya path runtime):
+
+```bash
+tar -C <lokasi-checkout-lokal> \
+  -czf portal-release.tar.gz \
+  public config src templates
+```
+
+Setelah snapshot/backup dibuat, arsip dapat diekstrak ke direktori release di server. Contoh tujuan yang sudah tercatat di runbook ini adalah `/var/www/portal`; konfirmasi path final dengan partner DevOps:
+
+```bash
+tar -C /var/www/portal -xzf portal-release.tar.gz
+```
+
+Alternatif `rsync` tanpa menghapus file di server:
+
+```bash
+rsync -a <lokasi-checkout-lokal>/public/ /var/www/portal/public/
+rsync -a <lokasi-checkout-lokal>/config/ /var/www/portal/config/
+rsync -a <lokasi-checkout-lokal>/src/ /var/www/portal/src/
+rsync -a <lokasi-checkout-lokal>/templates/ /var/www/portal/templates/
+```
+
+Jangan menggunakan PHP built-in server (`php -S`) sebagai server produksi; perintah tersebut hanya untuk pengembangan lokal. Nginx + PHP-FPM tetap menjadi runtime produksi.
+
+Partner DevOps bertanggung jawab atas konfigurasi Nginx, PHP-FPM, Caddy, TLS, firewall, backup, dan rollback di server. Repository hanya menyediakan source aplikasi dan contoh konfigurasi.
+
+### Jika Git akan digunakan di masa depan
+
+`git pull` baru dapat digunakan setelah:
+
+1. Remote Git resmi (nama dan URL) dikonfigurasi oleh pemilik repository atau partner DevOps.
+2. Branch deployment disepakati. Saat ini satu-satunya branch adalah `master`; jangan mengasumsikan branch `main`.
+3. Akses kredensial deployment dan mekanisme otorisasi disetujui.
+
+Tidak ada remote yang ditambahkan dan tidak ada perubahan konfigurasi Git dalam dokumen ini.
+
 ## Prosedur deploy dan rollback
 
 1. Buat snapshot LXC Proxmox atau backup arsip `/var/www/portal` sebelum perubahan.
-2. Salin source portal ke `/var/www/portal`, tetap pertahankan `config/`, `src/`, dan `templates/` di luar `public/` sebagai struktur sibling.
+2. Salin hanya `public/`, `config/`, `src/`, dan `templates/` sesuai prosedur penyalinan di atas. Jangan salin `legacy-nextjs/`, `legacy-nextjs/node_modules/`, `legacy-nextjs/.next/`, `.git/`, atau file rahasia.
 3. Jalankan lint PHP 8.5.12 dan pemeriksaan permission.
 4. Jalankan `nginx -t`, reload Nginx, lalu verifikasi upstream dari host Caddy.
 5. Validasi Caddy, reload Caddy, dan lakukan smoke test dari jaringan yang diizinkan.
@@ -240,5 +305,7 @@ Verifikasi manual:
 - Alamat email tim IT pengganti `it@wibindo.local`.
 - Daftar subnet LAN/VPN yang boleh mengakses portal dan root CA yang harus dipercaya client.
 - Konfirmasi kepemilikan/penamaan domain `wibindo.local`, URL final delapan aplikasi, dan apakah Livo legacy punya tanggal pensiun.
+- Konfirmasi metode deployment resmi (arsip, `rsync`, atau Git), lokasi checkout sumber, path release di server, serta URL dan branch remote Git bila kelak digunakan.
+- Konfirmasi bahwa `/var/www/portal` tetap menjadi path final dan bahwa partner DevOps bertanggung jawab atas Nginx, PHP-FPM, Caddy, TLS, firewall, backup, dan rollback.
 
 Tidak ada identitas resmi perusahaan yang dibuat atau diasumsikan oleh portal ini.
